@@ -2,15 +2,22 @@ using UnityEngine;
 
 public class Health : MonoBehaviour
 {
-    public int health = 100;
+    public int ObjectHealth = 100;
 
-    public void TakeDamage(int damage)
+    private Death death;
+
+    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    void Start()
     {
-        health -= damage;
+        death = GetComponent<Death>();
+    }
 
-        if (health <= 0)
+    public virtual void TakeDamage(int damage)
+    {
+        ObjectHealth -= damage;
+        if (ObjectHealth <= 0)
         {
-            Destroy(gameObject);
+            death.DoDeath();
         }
     }
 }
