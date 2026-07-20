@@ -9,19 +9,24 @@ public class UFOAIController : MonoBehaviour
     [Header("UI Health Bar")]
     [SerializeField] private Slider healthSlider;
     [SerializeField] private Transform canvasTransform;
-    [SerializeField] private int maxHealth = 50;
 
     private Transform playerTarget;
     private Camera mainCamera;
-    private int currentHealth;
+    private Health enemyHealth; // Reference to your existing health script
 
     private void Start()
     {
-        currentHealth = maxHealth;
-        if (healthSlider != null) healthSlider.maxValue = maxHealth;
-        UpdateHealthBar();
-
         mainCamera = Camera.main;
+
+        // Grab the existing Health component attached to this specific UFO
+        enemyHealth = GetComponent<Health>();
+
+        // Initialize the slider based on your existing health system variables
+        if (enemyHealth != null && healthSlider != null)
+        {
+            healthSlider.maxValue = enemyHealth.ObjectHealth;
+            healthSlider.value = enemyHealth.ObjectHealth;
+        }
 
         // Find player without relying on deprecated types
         GameObject player = GameObject.FindWithTag("Player");
@@ -32,6 +37,7 @@ public class UFOAIController : MonoBehaviour
     {
         MoveTowardsPlayer();
         BillboardUI();
+        UpdateHealthBar();
     }
 
     private void MoveTowardsPlayer()
@@ -44,7 +50,9 @@ public class UFOAIController : MonoBehaviour
 
         // Face the player target smoothly
         if (direction != Vector3.zero)
+        {
             transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(direction), Time.deltaTime * 5f);
+        }
     }
 
     private void BillboardUI()
@@ -56,22 +64,13 @@ public class UFOAIController : MonoBehaviour
         }
     }
 
-    public void TakeDamage(int damage)
-    {
-        currentHealth -= damage;
-        UpdateHealthBar();
-        AudioManager.Instance.PlaySFX(SFXType.TakeDamage);
-
-        if (currentHealth <= 0)
-        {
-            AudioManager.Instance.PlaySFX(SFXType.Die);
-            Destroy(gameObject);
-        }
-    }
-
     private void UpdateHealthBar()
     {
-        if (healthSlider != null) healthSlider.value = currentHealth;
+        // Continuously read the exact ObjectHealth from your script to update the UI
+        if (enemyHealth != null && healthSlider != null)
+        {
+            healthSlider.value = enemyHealth.ObjectHealth;
+        }
     }
 
     private void OnCollisionEnter(Collision collision)
