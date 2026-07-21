@@ -2,12 +2,12 @@ using UnityEngine;
 
 public class Astronaut : MonoBehaviour
 {
-    [SerializeField] private int pointValue = 100;
-    [SerializeField] private float rotationSpeed = 30f;
+    [SerializeField] private int scoreReward = 150;
+    [SerializeField] private float rotationSpeed = 45f;
 
     private void Update()
     {
-        // Float spinning in space
+        // Rotates smoothly in deep space
         transform.Rotate(Vector3.up * rotationSpeed * Time.deltaTime);
     }
 
@@ -15,9 +15,8 @@ public class Astronaut : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            // Point accumulation hooks
-            ScoreManager.Instance.AddScore(pointValue);
-            AudioManager.Instance.PlaySFX(SFXType.AstronautPickup);
+            if (ScoreManager.Instance != null) ScoreManager.Instance.AddScore(scoreReward);
+            if (AudioManager.Instance != null) AudioManager.Instance.PlaySFX(SFXType.AstronautPickup);
             Destroy(gameObject);
         }
     }

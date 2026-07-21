@@ -3,47 +3,52 @@ using System.Collections.Generic;
 
 public class Level : MonoBehaviour
 {
-    [Header("Ceiling Settings")]
-    [Tooltip("The maximum Y coordinate the player can reach.")]
+    [Header("Ceiling Boundaries")]
     [SerializeField] private float yMovementLimit = 15f;
 
-    [Header("Spawn Settings")]
-    [Tooltip("Target number of entities to randomly distribute across available level spawn points.")]
-    [SerializeField] private int totalEntitiesToSpawn = 5;
+    [Header("Designer Entity Limits")]
+    [Tooltip("Max number of UFOs to spawn across your UFO spawn points.")]
+    [SerializeField] private int ufoToSpawnCount = 3;
+    [Tooltip("Max number of Health Packs to spawn.")]
+    [SerializeField] private int healthPacksToSpawnCount = 2;
+    [Tooltip("Max number of Astronauts to spawn.")]
+    [SerializeField] private int astronautsToSpawnCount = 4;
 
-    private List<SpawnPoint> levelSpawnPoints = new List<SpawnPoint>();
+    [Header("Prefab References")]
+    [SerializeField] private GameObject ufoPrefab;
+    [SerializeField] private GameObject healthPackPrefab;
+    [SerializeField] private GameObject astronautPrefab;
 
+    private List<SpawnPoint> allLevelSpawnPoints = new List<SpawnPoint>();
     public float YMovementLimit => yMovementLimit;
 
     private void Awake()
     {
-        // Automatically find all instances without depending on deprecated sorting
-        // NEW CODE (No warning):
-        SpawnPoint[] foundPoints = Object.FindObjectsByType<SpawnPoint>();
-        levelSpawnPoints.AddRange(foundPoints);
+        // Safe, non-deprecated search for scene tracking elements
+        SpawnPoint[] foundPoints = Object.FindObjectsByType<SpawnPoint>(FindObjectsInactive.Include);
+        allLevelSpawnPoints.AddRange(foundPoints);
 
-        PopulateLevel();
+        // Process dynamic random allocations across categories
+        SpawnGroup(SpawnPoint.EntityType.UFO, ufoPrefab, ufoToSpawnCount);
+        SpawnGroup(SpawnPoint.EntityType.HealthPack, healthPackPrefab, healthPacksToSpawnCount);
+        SpawnGroup(SpawnPoint.EntityType.Astronaut, astronautPrefab, astronautsToSpawnCount);
     }
 
-    private void PopulateLevel()
+    private void SpawnGroup(SpawnPoint.EntityType targetType, GameObject prefab, int targetCount)
     {
-        if (levelSpawnPoints.Count == 0) return;
+        if (prefab == null) return;
 
-        // Shuffle the list or pick random points without repeating
-        List<SpawnPoint> availablePoints = new List<SpawnPoint>(levelSpawnPoints);
-        int spawnCount = Mathf.Min(totalEntitiesToSpawn, availablePoints.Count);
+        // Gather all matching designer points for this entity type
+        List<SpawnPoint> validPoints = allLevelSpawnPoints.FindAll(p => p.AllowedType == targetType);
+        int spawnCount = Mathf.Min(targetCount, validPoints.Count);
 
         for (int i = 0; i < spawnCount; i++)
         {
-            int randomIndex = Random.Range(0, availablePoints.Count);
-            SpawnPoint selectedPoint = availablePoints[randomIndex];
+            int randomIndex = Random.Range(0, validPoints.Count);
+            SpawnPoint point = validPoints[randomIndex];
 
-            if (selectedPoint.EntityPrefab != null)
-            {
-                Instantiate(selectedPoint.EntityPrefab, selectedPoint.transform.position, selectedPoint.transform.rotation);
-            }
-
-            availablePoints.RemoveAt(randomIndex); // Prevent double-spawning on a single point
+            Instantiate(prefab, point.transform.position, point.transform.rotation);
+            validPoints.RemoveAt(randomIndex); // Protect against duplicate overlapping spawns
         }
     }
 }

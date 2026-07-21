@@ -6,13 +6,13 @@ public class AudioManager : MonoBehaviour
 {
     public static AudioManager Instance { get; private set; }
 
-    [Header("Audio Sources")]
+    [Header("Mixer Channels")]
     [SerializeField] private AudioSource musicSource;
     [SerializeField] private AudioSource sfxSource;
 
-    [Header("Audio Clips")]
+    [Header("Sound Clips")]
     [SerializeField] private AudioClip shootClip;
-    [SerializeField] private AudioClip damageClip;
+    [SerializeField] private AudioClip takeDamageClip;
     [SerializeField] private AudioClip dieClip;
     [SerializeField] private AudioClip astronautClip;
     [SerializeField] private AudioClip healthClip;
@@ -30,21 +30,24 @@ public class AudioManager : MonoBehaviour
         }
     }
 
-    public void SetMusicVolume(float volume) => musicSource.volume = volume;
-    public void SetSFXVolume(float volume) => sfxSource.volume = volume;
+    public void AdjustMusicVolume(float val) => musicSource.volume = val;
+    public void AdjustSFXVolume(float val) => sfxSource.volume = val;
 
     public void PlaySFX(SFXType type)
     {
-        AudioClip clip = type switch
+        AudioClip selectedTrack = type switch
         {
             SFXType.Shoot => shootClip,
-            SFXType.TakeDamage => damageClip,
+            SFXType.TakeDamage => takeDamageClip,
             SFXType.Die => dieClip,
             SFXType.AstronautPickup => astronautClip,
             SFXType.HealthPickup => healthClip,
             _ => null
         };
 
-        if (clip != null) sfxSource.PlayOneShot(clip);
+        if (selectedTrack != null && sfxSource != null)
+        {
+            sfxSource.PlayOneShot(selectedTrack);
+        }
     }
 }

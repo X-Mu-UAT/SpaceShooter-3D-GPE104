@@ -2,17 +2,25 @@ using UnityEngine;
 
 public class SpawnPoint : MonoBehaviour
 {
-    [Header("Designer Configurations")]
-    [Tooltip("Drop the matching item Prefab variant here (Health pack, Astronaut, or UFO archetype).")]
-    [SerializeField] private GameObject entityPrefab;
+    public enum EntityType { UFO, HealthPack, Astronaut }
 
-    public GameObject EntityPrefab => entityPrefab;
+    [Header("Spawn Settings")]
+    [Tooltip("What type of entity is allowed to spawn at this specific landmark point?")]
+    [SerializeField] private EntityType allowedType;
+
+    public EntityType AllowedType => allowedType;
 
     private void OnDrawGizmos()
     {
-        // Visual indicator in Scene View for designers
-        Gizmos.color = Color.cyan;
+        // Color code anchors visually for your designers in the scene window
+        Gizmos.color = allowedType switch
+        {
+            EntityType.UFO => Color.red,
+            EntityType.HealthPack => Color.green,
+            EntityType.Astronaut => Color.cyan,
+            _ => Color.white
+        };
         Gizmos.DrawWireSphere(transform.position, 0.75f);
-        Gizmos.DrawRay(transform.position, transform.forward * 1.5f);
+        Gizmos.DrawRay(transform.position, transform.forward * 1.2f);
     }
 }

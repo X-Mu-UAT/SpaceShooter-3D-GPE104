@@ -3,81 +3,84 @@ using UnityEngine.UI;
 
 public class UFOAIController : MonoBehaviour
 {
-    [Header("Movement")]
-    [SerializeField] private float moveSpeed = 5f;
+    [Header("AI Movement")]
+    [SerializeField] private float moveSpeed = 6f;
 
-    [Header("UI Health Bar")]
+    [Header("World Space UI Elements")]
     [SerializeField] private Slider healthSlider;
     [SerializeField] private Transform canvasTransform;
 
     private Transform playerTarget;
     private Camera mainCamera;
-    private Health enemyHealth; // Reference to your existing health script
+    private Health ufoHealth;
+    private Rigidbody rb;
 
     private void Start()
     {
         mainCamera = Camera.main;
+        ufoHealth = GetComponent<Health>();
+        rb = GetComponent<Rigidbody>();
 
-        // Grab the existing Health component attached to this specific UFO
-        enemyHealth = GetComponent<Health>();
+        // Enforce script translation rules over environmental physics forces
+        if (rb != null) rb.isKinematic = true;
 
-        // Initialize the slider based on your existing health system variables
-        if (enemyHealth != null && healthSlider != null)
+        if (ufoHealth != null && healthSlider != null)
         {
-            healthSlider.maxValue = enemyHealth.ObjectHealth;
-            healthSlider.value = enemyHealth.ObjectHealth;
+            healthSlider.maxValue = ufoHealth.ObjectHealth;
+            healthSlider.value = ufoHealth.ObjectHealth;
         }
 
-        // Find player without relying on deprecated types
         GameObject player = GameObject.FindWithTag("Player");
         if (player != null) playerTarget = player.transform;
     }
 
     private void Update()
     {
-        MoveTowardsPlayer();
         BillboardUI();
-        UpdateHealthBar();
+        SyncSlider();
+    }
+
+    private void FixedUpdate()
+    {
+        MoveTowardsPlayer();
     }
 
     private void MoveTowardsPlayer()
     {
-        if (playerTarget == null) return;
+        if (playerTarget == null || rb == null) return;
 
-        // Strictly position-based translation movement bypassing physics engines
         Vector3 direction = (playerTarget.position - transform.position).normalized;
-        transform.position += direction * moveSpeed * Time.deltaTime;
+        Vector3 nextStep = transform.position + direction * moveSpeed * Time.fixedDeltaTime;
 
-        // Face the player target smoothly
+        rb.MovePosition(nextStep);
+
         if (direction != Vector3.zero)
         {
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(direction), Time.deltaTime * 5f);
+            rb.MoveRotation(Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(direction), Time.fixedDeltaTime * 6f));
         }
     }
 
     private void BillboardUI()
     {
-        // Forces World Space UI elements to directly square up with the Main Camera plane
         if (canvasTransform != null && mainCamera != null)
         {
             canvasTransform.LookAt(canvasTransform.position + mainCamera.transform.rotation * Vector3.forward, mainCamera.transform.rotation * Vector3.up);
         }
     }
 
-    private void UpdateHealthBar()
+    private void SyncSlider()
     {
-        // Continuously read the exact ObjectHealth from your script to update the UI
-        if (enemyHealth != null && healthSlider != null)
+        if (ufoHealth != null && healthSlider != null)
         {
-            healthSlider.value = enemyHealth.ObjectHealth;
+            healthSlider.value = ufoHealth.ObjectHealth;
         }
     }
 
-    private void OnCollisionEnter(Collision collision)
+    private void OnTriggerEnter(Collider other)
     {
-        if (collision.gameObject.TryGetComponent<Health>(out Health playerHealth))
+        // Instantly kill player ship on contact crash
+        if (other.CompareTag("Player") && other.TryGetComponent<Health>(out Health playerHealth))
         {
-            // Instantly kill the player by forcing maximum structural damage
             playerHealth.TakeDamage(playerHealth.ObjectHealth);
         }
     }

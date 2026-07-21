@@ -39,13 +39,14 @@ public class MenuController : MonoBehaviour
 
     public void OnMusicVolumeChanged()
     {
-        AudioManager.Instance.SetMusicVolume(musicSlider.value);
+        AudioManager.Instance.AdjustMusicVolume(musicSlider.value);
     }
 
     public void OnSFXVolumeChanged()
     {
-        AudioManager.Instance.SetSFXVolume(sfxSlider.value);
+        AudioManager.Instance.AdjustSFXVolume(sfxSlider.value);
     }
+
 
     public void LoadFirstLevel()
     {

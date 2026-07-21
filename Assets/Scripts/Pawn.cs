@@ -1,4 +1,3 @@
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
@@ -11,25 +10,45 @@ public class Pawn : MonoBehaviour
 
     public GameObject ProjectilePrefab;
     public Transform MuzzlePoint;
+
     protected Rigidbody Rigid;
     protected GameManager gameManager;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+
+    // Cached fields to safely pass input values from Update to FixedUpdate
+    protected float cachedDriving;
+    protected float cachedPitch;
+    protected float cachedYaw;
+    protected float cachedRoll;
+
     protected virtual void Start()
     {
         Rigid = GetComponent<Rigidbody>();
-        GameManager manager = Object.FindAnyObjectByType<GameManager>();
+        gameManager = Object.FindAnyObjectByType<GameManager>();
+
         Rigid.useGravity = false;
+
+        // Erases visual stuttering by predicting object positions between frames
+        Rigid.interpolation = RigidbodyInterpolation.Interpolate;
     }
+
     protected virtual void Update()
     {
-
+        // Read input and assign to cached variables in child classes (e.g., PlayerController)
     }
+
+    protected virtual void FixedUpdate()
+    {
+        // Executes physics calculations strictly on the physics clock
+        MoveShip(cachedDriving, cachedPitch, cachedYaw, cachedRoll);
+    }
+
     protected void MoveShip(float drivingInput, float pitchInput, float yawInput, float rollInput)
     {
-        Rigid.AddRelativeForce(Vector3.forward * drivingInput * thrust * Time.deltaTime);
-        Rigid.AddRelativeTorque(Vector3.right * pitchInput * PitchSpeed * Time.deltaTime);
-        Rigid.AddRelativeTorque(Vector3.up * yawInput * YawSpeed * Time.deltaTime);
-        Rigid.AddRelativeTorque(Vector3.back * rollInput * RollSpeed * Time.deltaTime);
+        // Swapped out Time.deltaTime for Time.fixedDeltaTime to guarantee fluid forces
+        Rigid.AddRelativeForce(Vector3.forward * drivingInput * thrust * Time.fixedDeltaTime);
+        Rigid.AddRelativeTorque(Vector3.right * pitchInput * PitchSpeed * Time.fixedDeltaTime);
+        Rigid.AddRelativeTorque(Vector3.up * yawInput * YawSpeed * Time.fixedDeltaTime);
+        Rigid.AddRelativeTorque(Vector3.back * rollInput * RollSpeed * Time.fixedDeltaTime);
     }
 
     public virtual void Shoot()
