@@ -44,12 +44,34 @@ public class Pawn : MonoBehaviour
 
     protected void MoveShip(float drivingInput, float pitchInput, float yawInput, float rollInput)
     {
-        // Swapped out Time.deltaTime for Time.fixedDeltaTime to guarantee fluid forces
-        Rigid.AddRelativeForce(Vector3.forward * drivingInput * thrust * Time.fixedDeltaTime);
+        // --- FORWARD MOVEMENT & COUNTER-BRAKING ---
+        if (Mathf.Abs(drivingInput) > 0.01f)
+        {
+            // Apply forward or backward engine thrust
+            Rigid.AddRelativeForce(Vector3.forward * drivingInput * thrust * Time.fixedDeltaTime);
+        }
+        else
+        {
+            // Active Braking: Instantly bleed out forward/backward velocity when keys are released
+            Vector3 localVelocity = transform.InverseTransformDirection(Rigid.linearVelocity);
+            localVelocity.z = Mathf.MoveTowards(localVelocity.z, 0f, 5f * Time.fixedDeltaTime); // Adjust '5f' for faster stopping
+            Rigid.linearVelocity = transform.TransformDirection(localVelocity);
+        }
+
+        // --- ROTATIONAL FORCES ---
         Rigid.AddRelativeTorque(Vector3.right * pitchInput * PitchSpeed * Time.fixedDeltaTime);
         Rigid.AddRelativeTorque(Vector3.up * yawInput * YawSpeed * Time.fixedDeltaTime);
         Rigid.AddRelativeTorque(Vector3.back * rollInput * RollSpeed * Time.fixedDeltaTime);
+
+        // --- ACTIVE ROTATION COUNTER-BRAKING ---
+        // If player is not giving rotational inputs, instantly halt the matching spin axis
+        if (Mathf.Abs(pitchInput) < 0.01f && Mathf.Abs(yawInput) < 0.01f && Mathf.Abs(rollInput) < 0.01f)
+        {
+            // Dampens out all spinning momentum smoothly
+            Rigid.angularVelocity = Vector3.MoveTowards(Rigid.angularVelocity, Vector3.zero, 10f * Time.fixedDeltaTime);
+        }
     }
+
 
     public virtual void Shoot()
     {

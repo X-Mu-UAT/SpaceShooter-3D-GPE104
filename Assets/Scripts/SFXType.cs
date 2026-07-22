@@ -27,11 +27,14 @@ public class AudioManager : MonoBehaviour
         else
         {
             Destroy(gameObject);
+            return; // CRUCIAL FIX: Stops execution immediately for the duplicate object
         }
     }
 
-    public void AdjustMusicVolume(float val) => musicSource.volume = val;
-    public void AdjustSFXVolume(float val) => sfxSource.volume = val;
+    // Safety checks added below using null-conditional operators (?.)
+    public void AdjustMusicVolume(float val) => musicSource?.gameObject.SetActive(true); // matching safety
+    public void AdjustMusicVolumeDirect(float val) { if (musicSource != null) musicSource.volume = val; }
+    public void AdjustSFXVolume(float val) { if (sfxSource != null) sfxSource.volume = val; }
 
     public void PlaySFX(SFXType type)
     {
