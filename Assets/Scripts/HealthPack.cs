@@ -12,7 +12,7 @@ public class HealthPack : MonoBehaviour
 
     private void Update()
     {
-        // Clean non-physics float offset tracking loop
+        // Clean non-physics float offset tracking loop 
         transform.position = startPosition + new Vector3(0f, Mathf.Sin(Time.time * bounceSpeed) * bounceMagnitude, 0f);
     }
 
@@ -20,10 +20,21 @@ public class HealthPack : MonoBehaviour
     {
         if (other.TryGetComponent<Health>(out Health playerHealth))
         {
-            // Restore structural points safely caps at 100 max
-            playerHealth.ObjectHealth = Mathf.Min(playerHealth.ObjectHealth + healAmount, 100);
+            // Track health before the healing occurs
+            int previousHealth = playerHealth.ObjectHealth;
 
-            if (AudioManager.Instance != null) AudioManager.Instance.PlaySFX(SFXType.HealthPickup);
+            // Restore structural points safely caps at 500 max to match player health
+            playerHealth.ObjectHealth = Mathf.Min(playerHealth.ObjectHealth + healAmount, 500);
+
+            // Calculate exact health gained (prevents over-reporting if already near 500)
+            int actualHealedAmount = playerHealth.ObjectHealth - previousHealth;
+
+            // Print the message directly to the Unity Console log
+            Debug.Log($"I healed! Grabbed health pack. Gained: +{actualHealedAmount} HP. Current Health: {playerHealth.ObjectHealth}/500");
+
+            if (AudioManager.Instance != null)
+                AudioManager.Instance.PlaySFX(SFXType.HealthPickup);
+
             Destroy(gameObject);
         }
     }

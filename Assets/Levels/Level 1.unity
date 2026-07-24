@@ -233,7 +233,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 219030949}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 244a03c80c319564aae750f06130c32f, type: 3}
   m_Name: 
@@ -319,14 +319,14 @@ AudioSource:
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 8300000, guid: 6c7062c84d45a42438831a958872eda9, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 1
+  m_Volume: 0.55
   m_Pitch: 1
-  Loop: 0
+  Loop: 1
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
-  Priority: 128
-  DopplerLevel: 1
+  Priority: 94
+  DopplerLevel: 0
   MinDistance: 1
   MaxDistance: 500
   Pan2D: 0
@@ -363,7 +363,7 @@ AudioSource:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 0
+      value: 0.408
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -1293,7 +1293,7 @@ Rigidbody:
   serializedVersion: 5
   m_Mass: 1
   m_LinearDamping: 0
-  m_AngularDamping: 0.05
+  m_AngularDamping: 0
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -1317,7 +1317,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1033780971}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6febb4b5dc0a79e4b98b20b792af6cc3, type: 3}
   m_Name: 
@@ -1341,7 +1341,7 @@ MonoBehaviour:
   ProjectilePrefab: {fileID: 7038165925123814105, guid: 47a458de181f5a246b6aee0ff26e204e, type: 3}
   MuzzlePoint: {fileID: 1904673903}
   GameCamera: {fileID: 330585548}
-  IdealCameraDistance: 7
+  IdealCameraDistance: 12
   CameraHeightOffset: 3
   MinimumCameraDistance: 3
   MaximumCameraDistance: 10
@@ -1372,6 +1372,8 @@ MonoBehaviour:
   ObjectHealth: 500
   awardsScoreOnDeath: 1
   scoreValue: 250
+  isPlayer: 1
+  gameOverSceneName: GameOver
 --- !u!4 &1033780977 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6087355082992116693, guid: 1ec10f8758081fa4da4be623ea8793a1, type: 3}
@@ -1627,7 +1629,7 @@ Transform:
   m_GameObject: {fileID: 1220535201}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.3, y: 7.58, z: -52.8}
+  m_LocalPosition: {x: -8, y: 7.58, z: -41.4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2034,6 +2036,51 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 166.73, y: 13.31516, z: 63.44}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1621153722
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1621153724}
+  - component: {fileID: 1621153723}
+  m_Layer: 0
+  m_Name: LevelManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1621153723
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1621153722}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ee4406f95e1729429630397ad3b718d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LevelManager
+  gameOverSceneName: GameOver
+--- !u!4 &1621153724
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1621153722}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.05583, y: 13.31516, z: 54.2}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2551,7 +2598,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2072326567}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 244a03c80c319564aae750f06130c32f, type: 3}
   m_Name: 
@@ -2570,10 +2617,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Level
   yMovementLimit: 20
-  ufoToSpawnCount: 0
+  ufoToSpawnCount: 6
   healthPacksToSpawnCount: 3
   astronautsToSpawnCount: 4
-  ufoPrefab: {fileID: 7237045075185480787, guid: 4db09b43833a15f43912f8651f442e2d, type: 3}
+  ufoPrefab: {fileID: 7888086998336367701, guid: 4db09b43833a15f43912f8651f442e2d, type: 3}
   healthPackPrefab: {fileID: 3669883134348563916, guid: 30e7a8627437ef541b7edae883d6b1d4, type: 3}
   astronautPrefab: {fileID: 8799672107085438397, guid: c7c1aeafac3bdd54c96117f0ca9e02b6, type: 3}
 --- !u!114 &2072326571
@@ -2626,7 +2673,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2116366110}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 244a03c80c319564aae750f06130c32f, type: 3}
   m_Name: 
@@ -2671,7 +2718,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2125801461}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 244a03c80c319564aae750f06130c32f, type: 3}
   m_Name: 
@@ -2703,6 +2750,7 @@ SceneRoots:
   - {fileID: 2072326568}
   - {fileID: 99289574}
   - {fileID: 1148090072}
+  - {fileID: 1621153724}
   - {fileID: 2116366112}
   - {fileID: 219030951}
   - {fileID: 2125801463}

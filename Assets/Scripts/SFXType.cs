@@ -27,15 +27,29 @@ public class AudioManager : MonoBehaviour
         else
         {
             Destroy(gameObject);
-            return; // CRUCIAL FIX: Stops execution immediately for the duplicate object
+            return; // Stops execution immediately for the duplicate object 
         }
     }
 
-    // Safety checks added below using null-conditional operators (?.)
-    public void AdjustMusicVolume(float val) => musicSource?.gameObject.SetActive(true); // matching safety
-    public void AdjustMusicVolumeDirect(float val) { if (musicSource != null) musicSource.volume = val; }
-    public void AdjustSFXVolume(float val) { if (sfxSource != null) sfxSource.volume = val; }
+    // FIXED: This is now the clean, unified function for your UI Music Slider
+    public void AdjustMusicVolume(float val)
+    {
+        if (musicSource != null)
+        {
+            musicSource.volume = val;
+        }
+    }
 
+    // FIXED: Clean function for your UI SFX Slider
+    public void AdjustSFXVolume(float val)
+    {
+        if (sfxSource != null)
+        {
+            sfxSource.volume = val;
+        }
+    }
+
+    // UNCHANGED: Your full sound effects library remains fully functional
     public void PlaySFX(SFXType type)
     {
         AudioClip selectedTrack = type switch

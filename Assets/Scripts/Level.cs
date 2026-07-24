@@ -20,15 +20,17 @@ public class Level : MonoBehaviour
     [SerializeField] private GameObject astronautPrefab;
 
     private List<SpawnPoint> allLevelSpawnPoints = new List<SpawnPoint>();
+
     public float YMovementLimit => yMovementLimit;
 
-    private void Awake()
+    // FIXED: Changed from Awake to Start so LevelManager can initialize its instance first!
+    private void Start()
     {
-        // Safe, non-deprecated search for scene tracking elements
+        // Safe, non-deprecated search for scene tracking elements 
         SpawnPoint[] foundPoints = Object.FindObjectsByType<SpawnPoint>(FindObjectsInactive.Include);
         allLevelSpawnPoints.AddRange(foundPoints);
 
-        // Process dynamic random allocations across categories
+        // Process dynamic random allocations across categories 
         SpawnGroup(SpawnPoint.EntityType.UFO, ufoPrefab, ufoToSpawnCount);
         SpawnGroup(SpawnPoint.EntityType.HealthPack, healthPackPrefab, healthPacksToSpawnCount);
         SpawnGroup(SpawnPoint.EntityType.Astronaut, astronautPrefab, astronautsToSpawnCount);
@@ -38,7 +40,7 @@ public class Level : MonoBehaviour
     {
         if (prefab == null) return;
 
-        // Gather all matching designer points for this entity type
+        // Gather all matching designer points for this entity type 
         List<SpawnPoint> validPoints = allLevelSpawnPoints.FindAll(p => p.AllowedType == targetType);
         int spawnCount = Mathf.Min(targetCount, validPoints.Count);
 
@@ -48,7 +50,7 @@ public class Level : MonoBehaviour
             SpawnPoint point = validPoints[randomIndex];
 
             Instantiate(prefab, point.transform.position, point.transform.rotation);
-            validPoints.RemoveAt(randomIndex); // Protect against duplicate overlapping spawns
+            validPoints.RemoveAt(randomIndex); // Protect against duplicate overlapping spawns 
         }
     }
 }
