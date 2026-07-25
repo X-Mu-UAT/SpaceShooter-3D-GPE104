@@ -1,9 +1,9 @@
 using UnityEngine;
-using UnityEngine.SceneManagement; // CRITICAL: Added so we can load the Game Over scene
+using UnityEngine.SceneManagement;
 
 public class Health : MonoBehaviour
 {
-    public int ObjectHealth = 100;
+    public int ObjectHealth = 500;
 
     [Header("Score Configuration")]
     [Tooltip("Check this if you want the player to get points when this object dies.")]
@@ -23,7 +23,7 @@ public class Health : MonoBehaviour
         death = GetComponent<Death>();
         respawnScript = GetComponent<SpaceshipRespawn>();
 
-        // If this is an enemy (NOT the player), register it automatically with the LevelManager
+        // If this is an enemy UFO, register it with the LevelManager
         if (!isPlayer && LevelManager.Instance != null)
         {
             LevelManager.Instance.RegisterEnemy();
@@ -32,44 +32,49 @@ public class Health : MonoBehaviour
 
     public virtual void TakeDamage(int damage)
     {
-        // Prevent damage calculation if the ship is already "dead"
         if (ObjectHealth <= 0) return;
 
         ObjectHealth -= damage;
 
         if (ObjectHealth <= 0)
         {
-            // Trigger the score right before death execution 
-            if (awardsScoreOnDeath && ScoreManager.Instance != null)
+            // FIX 1: ALWAYS payout scores to the GameManager first, regardless of who died!
+            if (awardsScoreOnDeath && GameManager.Instance != null)
             {
-                ScoreManager.Instance.AddScore(scoreValue);
+                GameManager.Instance.AddToScore(scoreValue);
             }
 
-            // PRIORITY 1: Check if this is the player. If so, ignore respawns and load Game Over!
+            // PRIORITY 1: Handle Player Death
             if (isPlayer)
             {
-                GameOverScreen.PlayerWon = false; // Mark as a loss
+                if (GameManager.Instance != null)
+                {
+                    // LoseALife handles respawning. If it returns TRUE, player is permanently out of lives.
+                    bool isGameOver = GameManager.Instance.LoseALife(gameObject, respawnScript);
 
-                // Unlock the mouse cursor so you can actually click the menu buttons
-                Cursor.lockState = CursorLockMode.None;
-                Cursor.visible = true;
+                    if (isGameOver)
+                    {
+                        GameOverScreen.PlayerWon = false; // Mark loss
 
-                SceneManager.LoadScene(gameOverSceneName);
-                return; // Stop execution here so the ship doesn't try to run respawn/death components below
+                        Cursor.lockState = CursorLockMode.None;
+                        Cursor.visible = true;
+
+                        SceneManager.LoadScene(gameOverSceneName);
+                    }
+                }
+                return; // Blocks execution so player doesn't fall through to enemy destruction logic
             }
 
-            // PRIORITY 2: If it's a non-player object that tracks enemy limits, unregister it
+            // PRIORITY 2: Handle Enemy UFO Death
             if (!isPlayer && LevelManager.Instance != null)
             {
                 LevelManager.Instance.UnregisterEnemy();
             }
 
-            // PRIORITY 3: If it's an object with a respawn system, use it
             if (respawnScript != null)
             {
                 respawnScript.TriggerRespawn();
             }
-            // PRIORITY 4: Fallback to permanent destruction for simple hazards/enemies
             else if (death != null)
             {
                 death.DoDeath();

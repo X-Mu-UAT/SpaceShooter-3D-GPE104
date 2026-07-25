@@ -45,14 +45,20 @@ public class LevelManager : MonoBehaviour
 
     private void TriggerWin()
     {
-        // Tell the game over screen that the player actually won!
+        // 1. Tell the game over screen that the player actually won!
         GameOverScreen.PlayerWon = true;
 
-        // Unlock mouse cursor so player can click buttons on the win screen
+        // 2. NEW FIX: Save the high score to disk before leaving the gameplay level
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.SaveHighScorePublic();
+        }
+
+        // 3. Unlock mouse controls
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
 
-        // Load the shared end screen
+        // 4. Load the shared end screen asset
         SceneManager.LoadScene(gameOverSceneName);
     }
 }

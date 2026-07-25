@@ -1,22 +1,44 @@
 using UnityEngine;
 
-public class Astronaut : MonoBehaviour
+public class AstronautPickup : MonoBehaviour
 {
-    [SerializeField] private int scoreReward = 150;
-    [SerializeField] private float rotationSpeed = 45f;
+    [Header("Score Settings")]
+    [Tooltip("Points awarded for rescuing this astronaut.")]
+    [SerializeField] private int scoreValue = 500;
 
-    private void Update()
-    {
-        // Rotates smoothly in deep space
-        transform.Rotate(Vector3.up * rotationSpeed * Time.deltaTime);
-    }
+    [Header("Visual Effects")]
+    [SerializeField] private GameObject rescueParticlePrefab;
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player"))
+        // 1. Verify that the object touching the astronaut is the human player
+        // We look for your custom SpaceshipController script to confirm it's the player
+        if (other.GetComponent<Pawn>() != null)
         {
-            if (ScoreManager.Instance != null) ScoreManager.Instance.AddScore(scoreReward);
-            if (AudioManager.Instance != null) AudioManager.Instance.PlaySFX(SFXType.AstronautPickup);
+            // 2. Play rescue audio via your AudioManager instance
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.PlaySFX(SFXType.AstronautPickup);
+            }
+
+            // 3. FIX: Add the rescue points directly to your persistent GameManager
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.AddToScore(scoreValue);
+                Debug.Log($"Astronaut rescued! Score +{scoreValue}. Total: {GameManager.Instance.GetCurrentScore()}");
+            }
+            else
+            {
+                Debug.LogError("[AstronautPickup] Could not find GameManager.Instance! Score not counted.");
+            }
+
+            // 4. Optional: Spawn a glittering visual particle burst on rescue
+            if (rescueParticlePrefab != null)
+            {
+                Instantiate(rescueParticlePrefab, transform.position, transform.rotation);
+            }
+
+            // 5. Delete the astronaut from the space scene so they can only be grabbed once
             Destroy(gameObject);
         }
     }
