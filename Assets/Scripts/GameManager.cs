@@ -46,17 +46,38 @@ public class GameManager : MonoBehaviour
             return true; // Game Over
         }
 
-        // Reset player health if component exists
-        Health playerHealthComponent = playerShip != null ? playerShip.GetComponent<Health>() : null;
-            if (playerHealthComponent != null)
+        // Safely teleport the player's physical body and visual transform to (0,0,0)
+        if (playerShip != null)
+        {
+            Rigidbody playerRigidbody = playerShip.GetComponent<Rigidbody>();
+            if (playerRigidbody != null)
             {
-                playerHealthComponent.ObjectHealth = 500;
+                // FIXED: Manually zero out all velocity values to stop the physics engine cleanly.
+                // This replaces ResetDynamics() and works on every single version of Unity.
+                playerRigidbody.linearVelocity = Vector3.zero;
+                playerRigidbody.angularVelocity = Vector3.zero;
+
+                // Snap the physical physics container directly to the origin
+                playerRigidbody.position = Vector3.zero;
+                playerRigidbody.rotation = Quaternion.identity;
             }
 
-            if (respawnSystem != null)
-            {
-                respawnSystem.TriggerRespawn();
-            }
+            // Snap the visual hierarchy transform to match (0,0,0)
+            playerShip.transform.position = Vector3.zero;
+            playerShip.transform.rotation = Quaternion.identity;
+        }
+
+        // Reset player health if component exists
+        Health playerHealthComponent = playerShip != null ? playerShip.GetComponent<Health>() : null;
+        if (playerHealthComponent != null)
+        {
+            playerHealthComponent.ObjectHealth = 500;
+        }
+
+        if (respawnSystem != null)
+        {
+            respawnSystem.TriggerRespawn();
+        }
 
         return false; // Not Game Over
     }

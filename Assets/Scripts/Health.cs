@@ -4,6 +4,8 @@ using UnityEngine.SceneManagement;
 public class Health : MonoBehaviour
 {
     public int ObjectHealth = 500;
+    public bool IsPlayer => isPlayer;
+
 
     [Header("Score Configuration")]
     [Tooltip("Check this if you want the player to get points when this object dies.")]
